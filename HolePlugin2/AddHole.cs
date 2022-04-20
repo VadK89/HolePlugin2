@@ -48,7 +48,7 @@ namespace HolePlugin2
                 .OfClass(typeof(Pipe))
                 .Cast<Pipe>()
                 .ToList();
-            //Поиск #D виде для  ReferenceIntersector
+            //Поиск 3D вида для  ReferenceIntersector
             View3D view3D = new FilteredElementCollector(arDoc)
                 .OfClass(typeof(View3D))
                 .OfType<View3D>()
@@ -61,7 +61,7 @@ namespace HolePlugin2
             }
 
             ReferenceIntersector referenceIntersector = new ReferenceIntersector(new ElementClassFilter(typeof(Wall)), FindReferenceTarget.Element, view3D);
-
+            //активация семейства
             Transaction transaction1 = new Transaction(arDoc);
             transaction1.Start("Активация символа");
             if (!familySymbol.IsActive)
@@ -70,19 +70,17 @@ namespace HolePlugin2
             }
             transaction1.Commit();
 
-
             //перебор воздуховодов и вставка отверстия в модель
             Transaction transaction = new Transaction(arDoc);
             transaction.Start("Расстановка отверстий");
             DuctHoles(arDoc, referenceIntersector, ducts, familySymbol);
             PipeHoles(arDoc, referenceIntersector, pipes, familySymbol);
-
             transaction.Commit();
 
             return Result.Succeeded;
         }
-
-        private void PipeHoles(Document arDoc, ReferenceIntersector referenceIntersector, List<Pipe> pipes, FamilySymbol familySymbol)
+        //для труб
+        public void PipeHoles(Document arDoc, ReferenceIntersector referenceIntersector, List<Pipe> pipes, FamilySymbol familySymbol)
         {
             foreach (Pipe p in pipes)
             {
@@ -114,6 +112,7 @@ namespace HolePlugin2
                 }
             }
         }
+        //для воздуховодов
         public void DuctHoles(Document arDoc, ReferenceIntersector referenceIntersector, List<Duct> ducts, FamilySymbol familySymbol)
         {
             foreach (Duct d in ducts)
@@ -147,7 +146,7 @@ namespace HolePlugin2
             }
 
         }
-
+        //класс для сопоставления стен
         public class ReferenceWithContextElementEqualityComparer : IEqualityComparer<ReferenceWithContext>
         {
             public bool Equals(ReferenceWithContext x, ReferenceWithContext y)
